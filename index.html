@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEURON H4X v3.1.4</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'terminal': '#0f1923',
+                        'neon-green': '#39ff14',
+                        'neon-blue': '#00f3ff',
+                        'neon-purple': '#bf00ff',
+                        'neon-red': '#ff073a',
+                        'dark-gray': '#1a1a1a',
+                        'medium-gray': '#2d2d2d'
+                    },
+                    fontFamily: {
+                        'mono': ['Consolas', 'Monaco', 'Courier New', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow-neon {
+                text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
+            }
+            .border-glow {
+                box-shadow: 0 0 5px currentColor, 0 0 10px currentColor;
+            }
+            .scan-line {
+                background: linear-gradient(to bottom, transparent 50%, rgba(57, 255, 20, 0.1) 50%);
+                background-size: 100% 4px;
+                pointer-events: none;
+            }
+            .matrix-bg {
+                background-image: 
+                    linear-gradient(rgba(15, 25, 35, 0.95) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(15, 25, 35, 0.3) 1px, transparent 1px);
+                background-size: 20px 20px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-terminal text-gray-300 font-mono min-h-screen overflow-hidden">
+    <!-- Scan line effect overlay -->
+    <div class="scan-line fixed top-0 left-0 w-full h-full z-50 opacity-30"></div>
+    
+    <!-- System Header -->
+    <header class="bg-dark-gray border-b border-neon-green/30 py-1 px-4 flex justify-between items-center text-neon-green text-xs">
+        <div class="flex items-center space-x-4">
+            <div>NEURON H4X v3.1.4</div>
+            <div>USER: root@neuron</div>
+            <div>IP: 192.168.13.37</div>
+        </div>
+        <div class="flex items-center space-x-4">
+            <div>UPTIME: 14d 3h 27m</div>
+            <div id="system-time">00:00:00</div>
+            <div class="flex items-center">
+                <span class="inline-block w-2 h-2 bg-neon-red rounded-full mr-1"></span>
+                SYS OK
+            </div>
+        </div>
+    </header>
+
+    <div class="flex h-[calc(100vh-22px)] overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-dark-gray border-r border-neon-green/30 flex flex-col">
+            <div class="p-3 border-b border-neon-green/30">
+                <h2 class="text-neon-green font-bold text-lg text-shadow-neon">MODULES</h2>
+            </div>
+            
+            <nav class="flex-1 overflow-y-auto p-2">
+                <ul class="space-y-1">
+                    <li>
+                        <a href="#terminal" class="tool-link flex items-center p-2 hover:bg-medium-gray rounded text-neon-green transition-colors" data-tool="terminal">
+                            <i class="fa fa-terminal w-6"></i>
+                            <span>Terminal</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#scanner" class="tool-link flex items-center p-2 hover:bg-medium-gray rounded text-gray-400 transition-colors" data-tool="scanner">
+                            <i class="fa fa-search w-6"></i>
+                            <span>Port Scanner</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#cracker" class="tool-link flex items-center p-2 hover:bg-medium-gray rounded text-gray-400 transition-colors" data-tool="cracker">
+                            <i class="fa fa-key w-6"></i>
+                            <span>Hash Cracker</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#analyzer" class="tool-link flex items-center p-2 hover:bg-medium-gray rounded text-gray-400 transition-colors" data-tool="analyzer">
+                            <i class="fa fa-bar-chart w-6"></i>
+                            <span>Network Analyzer</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#exploit" class="tool-link flex items-center p-2 hover:bg-medium-gray rounded text-gray-400 transition-colors" data-tool="exploit">
+                            <i class="fa fa-bug w-6"></i>
+                            <span>Exploit Framework</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#forensics" class="tool-link flex items-center p-2 hover:bg-medium-gray rounded text-gray-400 transition-colors" data-tool="forensics">
+                            <i class="fa fa-search-plus w-6"></i>
+                            <span>Forensics Toolkit</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#crypto" class="tool-link flex items-center p-2 hover:bg-medium-gray rounded text-gray-400 transition-colors" data-tool="crypto">
+                            <i class="fa fa-lock w-6"></i>
+                            <span>Crypto Suite</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#editor" class="tool-link flex items-center p-2 hover:bg-medium-gray rounded text-gray-400 transition-colors" data-tool="editor">
+                            <i class="fa fa-code w-6"></i>
+                            <span>Code Editor</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#monitor" class="tool-link flex items-center p-2 hover:bg-medium-gray rounded text-gray-400 transition-colors" data-tool="monitor">
+                            <i class="fa fa-tachometer w-6"></i>
+                            <span>System Monitor</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="mt-6 pt-4 border-t border-neon-green/20">
+                    <h3 class="text-neon-blue text-xs uppercase mb-2 px-2">Active Sessions</h3>
+                    <ul class="space-y-1 text-xs">
+                        <li class="flex items-center p-1 hover:bg-medium-gray rounded">
+                            <span class="inline-block w-2 h-2 bg-neon-green rounded-full mr-2"></span>
+                            <span>SSH: 172.16.0.42</span>
+                        </li>
+                        <li class="flex items-center p-1 hover:bg-medium-gray rounded">
+                            <span class="inline-block w-2 h-2 bg-neon-green rounded-full mr-2"></span>
+                            <span>VNC: 10.0.2.15</span>
+                        </li>
+                        <li class="flex items-center p-1 hover:bg-medium-gray rounded">
+                            <span class="inline-block w-2 h-2 bg-neon-red rounded-full mr-2"></span>
+                            <span>VPN: disconnected</span>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+            <div class="p-3 border-t border-neon-green/30 text-xs">
+                <div class="flex justify-between mb-1">
+                    <span>CPU:</span>
+                    <span class="text-neon-green">37%</span>
+                </div>
+                <div class="w-full bg-dark-gray rounded-full h-1.5 mb-2">
+                    <div class="bg-neon-green h-1.5 rounded-full" style="width: 37%"></div>
+                </div>
+                <div class="flex justify-between mb-1">
+                    <span>RAM:</span>
+                    <span class="text-neon-blue">62%</span>
+                </div>
+                <div class="w-full bg-dark-gray rounded-full h-1.5 mb-2">
+                    <div class="bg-neon-blue h-1.5 rounded-full" style="width: 62%"></div>
+                </div>
+                <div class="flex justify-between mb-1">
+                    <span>DISK:</span>
+                    <span class="text-neon-purple">18%</span>
+                </div>
+                <div class="w-full bg-dark-gray rounded-full h-1.5">
+                    <div class="bg-neon-purple h-1.5 rounded-full" style="width: 18%"></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col overflow-hidden matrix-bg">
+            <!-- Tool Windows -->
+            <div class="flex-1 overflow-hidden relative">
+                <!-- Terminal Tool -->
+                <div id="terminal" class="tool-window absolute inset-0 flex flex-col">
+                    <div class="bg-medium-gray border-b border-neon-green/30 px-4 py-2 flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i class="fa fa-terminal text-neon-green mr-2"></i>
+                            <h2 class="text-neon-green">Terminal - /home/root</h2>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-window-minimize text-xs"></i>
+                            </button>
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-window-maximize text-xs"></i>
+                            </button>
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-times text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 overflow-y-auto p-4" id="terminal-output">
+                        <div class="mb-2">
+                            <span class="text-neon-purple">neuron-h4x login: </span><span class="text-gray-300">root</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="text-neon-purple">Password: </span><span class="text-gray-300">************</span>
+                        </div>
+                        <div class="mb-4 text-neon-green">
+                            NEURON H4X Security Platform v3.1.4<br>
+                            Kernel 5.18.12-h4x on x86_64 (12 CPU)<br>
+                            Last login: Tue Jun 13 04:22:17 2023 from 192.168.1.105
+                        </div>
+                        
+                        <div class="mb-1">
+                            <span class="text-neon-blue">root@neuron</span><span class="text-gray-400">:</span><span class="text-neon-purple">~</span><span class="text-gray-300">#</span> <span class="text-gray-300">system-info</span>
+                        </div>
+                        <div class="mb-4 pl-4 text-sm">
+                            <div class="mb-1"><span class="text-neon-green">Hostname:</span> neuron-h4x</div>
+                            <div class="mb-1"><span class="text-neon-green">Architecture:</span> x86_64</div>
+                            <div class="mb-1"><span class="text-neon-green">CPU:</span> Intel(R) Core(TM) i9-12900K @ 5.20GHz (12 cores)</div>
+                            <div class="mb-1"><span class="text-neon-green">Memory:</span> 32GB DDR5 @ 5200MHz</div>
+                            <div class="mb-1"><span class="text-neon-green">Storage:</span> 2TB NVMe SSD (encrypted)</div>
+                            <div><span class="text-neon-green">Network:</span> Intel AX210 Wi-Fi 6E, 10Gbps Ethernet</div>
+                        </div>
+                        
+                        <div class="mb-1">
+                            <span class="text-neon-blue">root@neuron</span><span class="text-gray-400">:</span><span class="text-neon-purple">~</span><span class="text-gray-300">#</span> <span class="text-gray-300">netstat -tulpn</span>
+                        </div>
+                        <div class="mb-4 pl-4 text-xs overflow-x-auto">
+                            <table class="w-full border-collapse">
+                                <thead>
+                                    <tr class="text-neon-green border-b border-gray-700">
+                                        <th class="text-left pb-1">Proto</th>
+                                        <th class="text-left pb-1">Local Address</th>
+                                        <th class="text-left pb-1">Foreign Address</th>
+                                        <th class="text-left pb-1">State</th>
+                                        <th class="text-left pb-1">PID/Program name</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b border-gray-800">
+                                        <td>tcp</td>
+                                        <td>0.0.0.0:22</td>
+                                        <td>0.0.0.0:*</td>
+                                        <td>LISTEN</td>
+                                        <td>1234/sshd</td>
+                                    </tr>
+                                    <tr class="border-b border-gray-800">
+                                        <td>tcp</td>
+                                        <td>0.0.0.0:8080</td>
+                                        <td>0.0.0.0:*</td>
+                                        <td>LISTEN</td>
+                                        <td>5678/proxy</td>
+                                    </tr>
+                                    <tr class="border-b border-gray-800">
+                                        <td>udp</td>
+                                        <td>0.0.0.0:5353</td>
+                                        <td>0.0.0.0:*</td>
+                                        <td>-</td>
+                                        <td>9101/dnsmasq</td>
+                                    </tr>
+                                    <tr>
+                                        <td>tcp</td>
+                                        <td>192.168.1.100:443</td>
+                                        <td>172.16.0.42:56732</td>
+                                        <td>ESTABLISHED</td>
+                                        <td>1234/sshd</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="mb-1">
+                            <span class="text-neon-blue">root@neuron</span><span class="text-gray-400">:</span><span class="text-neon-purple">~</span><span class="text-gray-300">#</span> <span class="text-gray-300">service --status</span>
+                        </div>
+                        <div class="mb-4 pl-4 text-sm">
+                            <div class="mb-1"><span class="text-neon-green">[ RUNNING ]</span> firewall.service</div>
+                            <div class="mb-1"><span class="text-neon-green">[ RUNNING ]</span> vpn-daemon.service</div>
+                            <div class="mb-1"><span class="text-neon-red">[ FAILED ]</span> tor-relay.service</div>
+                            <div class="mb-1"><span class="text-neon-green">[ RUNNING ]</span> packet-capture.service</div>
+                            <div><span class="text-neon-green">[ RUNNING ]</span> crypto-miner.service</div>
+                        </div>
+                        
+                        <div>
+                            <span class="text-neon-blue">root@neuron</span><span class="text-gray-400">:</span><span class="text-neon-purple">~</span><span class="text-gray-300">#</span> <span id="terminal-input-cursor">_</span>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-neon-green/30 p-2 bg-dark-gray">
+                        <div class="flex justify-between text-xs">
+                            <div>History: 127 commands</div>
+                            <div>Last cleared: 2023-06-10 03:45</div>
+                            <div>Shell: zsh 5.9</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Port Scanner Tool -->
+                <div id="scanner" class="tool-window absolute inset-0 flex flex-col hidden">
+                    <div class="bg-medium-gray border-b border-neon-green/30 px-4 py-2 flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i class="fa fa-search text-neon-green mr-2"></i>
+                            <h2 class="text-neon-green">Port Scanner - NexusScan v2.4</h2>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-window-minimize text-xs"></i>
+                            </button>
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-window-maximize text-xs"></i>
+                            </button>
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-times text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-1 overflow-hidden">
+                        <div class="w-1/3 border-r border-neon-green/30 p-4 flex flex-col">
+                            <h3 class="text-neon-blue mb-3 text-sm font-bold">Scan Configuration</h3>
+                            
+                            <div class="mb-4">
+                                <label class="block text-xs mb-1">Target IP/Range</label>
+                                <input type="text" value="192.168.1.1-255" class="w-full bg-dark-gray border border-neon-green/30 rounded px-2 py-1 text-sm focus:outline-none focus:border-neon-green">
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-xs mb-1">Port Range</label>
+                                <div class="flex space-x-2">
+                                    <input type="text" value="1" class="flex-1 bg-dark-gray border border-neon-green/30 rounded px-2 py-1 text-sm focus:outline-none focus:border-neon-green">
+                                    <span class="text-center self-center">-</span>
+                                    <input type="text" value="1000" class="flex-1 bg-dark-gray border border-neon-green/30 rounded px-2 py-1 text-sm focus:outline-none focus:border-neon-green">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-xs mb-1">Scan Type</label>
+                                <select class="w-full bg-dark-gray border border-neon-green/30 rounded px-2 py-1 text-sm focus:outline-none focus:border-neon-green">
+                                    <option>SYN Scan (Stealth)</option>
+                                    <option>TCP Connect Scan</option>
+                                    <option>UDP Scan</option>
+                                    <option>FIN Scan</option>
+                                    <option>XMAS Scan</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-xs mb-1">Speed</label>
+                                <div class="flex items-center">
+                                    <input type="range" min="1" max="5" value="3" class="w-full accent-neon-green">
+                                    <span class="ml-2 text-xs">3/5</span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-xs mb-1">Additional Options</label>
+                                <div class="space-y-1 text-xs">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" checked class="mr-2 accent-neon-green">
+                                        <span>Detect service versions</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-2 accent-neon-green">
+                                        <span>OS detection</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" checked class="mr-2 accent-neon-green">
+                                        <span>Save results to file</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-2 accent-neon-green">
+                                        <span>Aggressive scan</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-auto">
+                                <button class="w-full bg-neon-green/20 hover:bg-neon-green/30 text-neon-green py-2 rounded border border-neon-green/50 transition-colors flex items-center justify-center">
+                                    <i class="fa fa-play mr-2"></i>
+                                    Start Scan
+                                </button>
+                                <button class="w-full mt-2 bg-dark-gray hover:bg-medium-gray py-2 rounded border border-gray-700 transition-colors text-sm">
+                                    Load Preset
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-1 flex flex-col">
+                            <div class="border-b border-neon-green/30 p-2 flex justify-between items-center">
+                                <div class="text-sm">Scan Results - 192.168.1.105</div>
+                                <div class="flex space-x-2 text-xs">
+                                    <button class="px-2 py-1 bg-dark-gray hover:bg-medium-gray rounded">
+                                        <i class="fa fa-save mr-1"></i> Save
+                                    </button>
+                                    <button class="px-2 py-1 bg-dark-gray hover:bg-medium-gray rounded">
+                                        <i class="fa fa-share-alt mr-1"></i> Export
+                                    </button>
+                                    <button class="px-2 py-1 bg-dark-gray hover:bg-medium-gray rounded">
+                                        <i class="fa fa-filter mr-1"></i> Filter
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="flex-1 overflow-y-auto p-4">
+                                <div class="mb-4 pb-4 border-b border-gray-800">
+                                    <div class="text-neon-blue mb-2">Target: 192.168.1.105 (acme-corp-server.local)</div>
+                                    <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                                        <div><span class="text-neon-green">Status:</span> Up</div>
+                                        <div><span class="text-neon-green">Last seen:</span> 04:32:17</div>
+                                        <div><span class="text-neon-green">OS:</span> Linux 5.4-5.10 (Ubuntu)</div>
+                                        <div><span class="text-neon-green">MAC:</span> 00:1B:44:11:3A:B7 (Intel Corp)</div>
+                                        <div><span class="text-neon-green">Open ports:</span> 8</div>
+                                        <div><span class="text-neon-green">Scan time:</span> 00:02:47</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="overflow-x-auto">
+                                    <table class="w-full border-collapse text-xs">
+                                        <thead>
+                                            <tr class="text-neon-green border-b border-gray-700">
+                                                <th class="text-left pb-2">Port</th>
+                                                <th class="text-left pb-2">Service</th>
+                                                <th class="text-left pb-2">State</th>
+                                                <th class="text-left pb-2">Version</th>
+                                                <th class="text-left pb-2">Vulnerabilities</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="border-b border-gray-800 hover:bg-medium-gray/30">
+                                                <td class="py-2">21/tcp</td>
+                                                <td>ftp</td>
+                                                <td><span class="text-neon-red">open</span></td>
+                                                <td>vsftpd 3.0.3</td>
+                                                <td><span class="text-neon-red">CVE-2011-0762</span></td>
+                                            </tr>
+                                            <tr class="border-b border-gray-800 hover:bg-medium-gray/30">
+                                                <td class="py-2">22/tcp</td>
+                                                <td>ssh</td>
+                                                <td><span class="text-neon-red">open</span></td>
+                                                <td>OpenSSH 8.2p1 Ubuntu 4ubuntu0.4</td>
+                                                <td>-</td>
+                                            </tr>
+                                            <tr class="border-b border-gray-800 hover:bg-medium-gray/30">
+                                                <td class="py-2">80/tcp</td>
+                                                <td>http</td>
+                                                <td><span class="text-neon-red">open</span></td>
+                                                <td>Apache httpd 2.4.41</td>
+                                                <td><span class="text-neon-red">CVE-2021-41773</span></td>
+                                            </tr>
+                                            <tr class="border-b border-gray-800 hover:bg-medium-gray/30">
+                                                <td class="py-2">443/tcp</td>
+                                                <td>https</td>
+                                                <td><span class="text-neon-red">open</span></td>
+                                                <td>Apache httpd 2.4.41</td>
+                                                <td><span class="text-neon-red">CVE-2021-41773</span></td>
+                                            </tr>
+                                            <tr class="border-b border-gray-800 hover:bg-medium-gray/30">
+                                                <td class="py-2">3306/tcp</td>
+                                                <td>mysql</td>
+                                                <td><span class="text-neon-red">open</span></td>
+                                                <td>MySQL 8.0.26</td>
+                                                <td><span class="text-neon-yellow">Possible weak credentials</span></td>
+                                            </tr>
+                                            <tr class="border-b border-gray-800 hover:bg-medium-gray/30">
+                                                <td class="py-2">8080/tcp</td>
+                                                <td>http-proxy</td>
+                                                <td><span class="text-neon-red">open</span></td>
+                                                <td>Node.js Express 4.17.1</td>
+                                                <td><span class="text-neon-red">CVE-2022-24999</span></td>
+                                            </tr>
+                                            <tr class="border-b border-gray-800 hover:bg-medium-gray/30">
+                                                <td class="py-2">9000/tcp</td>
+                                                <td>php-fpm</td>
+                                                <td><span class="text-neon-red">open</span></td>
+                                                <td>PHP 7.4.3</td>
+                                                <td>-</td>
+                                            </tr>
+                                            <tr class="hover:bg-medium-gray/30">
+                                                <td class="py-2">27017/tcp</td>
+                                                <td>mongodb</td>
+                                                <td><span class="text-neon-red">open</span></td>
+                                                <td>MongoDB 4.4.6</td>
+                                                <td><span class="text-neon-red">No authentication</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <div class="mt-4 p-3 bg-dark-gray rounded text-xs">
+                                    <h4 class="text-neon-blue mb-1">Vulnerability Summary</h4>
+                                    <div class="space-y-1">
+                                        <div><span class="text-neon-red">Critical:</span> 3 vulnerabilities</div>
+                                        <div><span class="text-neon-yellow">High:</span> 2 vulnerabilities</div>
+                                        <div><span class="text-neon-green">Medium:</span> 1 vulnerability</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hash Cracker Tool -->
+                <div id="cracker" class="tool-window absolute inset-0 flex flex-col hidden">
+                    <div class="bg-medium-gray border-b border-neon-green/30 px-4 py-2 flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i class="fa fa-key text-neon-green mr-2"></i>
+                            <h2 class="text-neon-green">Hash Cracker - Brutalis v4.7</h2>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-window-minimize text-xs"></i>
+                            </button>
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-window-maximize text-xs"></i>
+                            </button>
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-times text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-1 overflow-hidden">
+                        <div class="w-1/3 border-r border-neon-green/30 p-4 flex flex-col">
+                            <h3 class="text-neon-blue mb-3 text-sm font-bold">Cracking Configuration</h3>
+                            
+                            <div class="mb-4">
+                                <label class="block text-xs mb-1">Hash Type</label>
+                                <select class="w-full bg-dark-gray border border-neon-green/30 rounded px-2 py-1 text-sm focus:outline-none focus:border-neon-green">
+                                    <option>MD5</option>
+                                    <option>SHA-1</option>
+                                    <option selected>SHA-256</option>
+                                    <option>SHA-512</option>
+                                    <option>NTLM</option>
+                                    <option>bcrypt</option>
+                                    <option>WPA/WPA2</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-xs mb-1">Hash Value(s)</label>
+                                <textarea class="w-full bg-dark-gray border border-neon-green/30 rounded px-2 py-1 text-sm focus:outline-none focus:border-neon-green h-32" placeholder="Enter hash values, one per line">5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d</textarea>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-xs mb-1">Attack Type</label>
+                                <select class="w-full bg-dark-gray border border-neon-green/30 rounded px-2 py-1 text-sm focus:outline-none focus:border-neon-green">
+                                    <option>Dictionary</option>
+                                    <option selected>Brute-force</option>
+                                    <option>Hybrid</option>
+                                    <option>Mask</option>
+                                    <option>Rainbow Table</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-xs mb-1">Character Set</label>
+                                <div class="space-y-1 text-xs">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" checked class="mr-2 accent-neon-green">
+                                        <span>Lowercase (a-z)</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" checked class="mr-2 accent-neon-green">
+                                        <span>Uppercase (A-Z)</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" checked class="mr-2 accent-neon-green">
+                                        <span>Numbers (0-9)</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-2 accent-neon-green">
+                                        <span>Symbols (!@#$...)</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-xs mb-1">Password Length</label>
+                                <div class="flex space-x-2">
+                                    <input type="number" value="4" min="1" max="32" class="flex-1 bg-dark-gray border border-neon-green/30 rounded px-2 py-1 text-sm focus:outline-none focus:border-neon-green">
+                                    <span class="text-center self-center">-</span>
+                                    <input type="number" value="8" min="1" max="32" class="flex-1 bg-dark-gray border border-neon-green/30 rounded px-2 py-1 text-sm focus:outline-none focus:border-neon-green">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-xs mb-1">Performance</label>
+                                <div class="flex items-center">
+                                    <input type="range" min="1" max="10" value="7" class="w-full accent-neon-green">
+                                    <span class="ml-2 text-xs">7/10</span>
+                                </div>
+                                <div class="text-xs mt-1 text-gray-500">Higher values use more system resources</div>
+                            </div>
+                            
+                            <div class="mt-auto">
+                                <button class="w-full bg-neon-green/20 hover:bg-neon-green/30 text-neon-green py-2 rounded border border-neon-green/50 transition-colors flex items-center justify-center">
+                                    <i class="fa fa-play mr-2"></i>
+                                    Start Cracking
+                                </button>
+                                <button class="w-full mt-2 bg-dark-gray hover:bg-medium-gray py-2 rounded border border-gray-700 transition-colors text-sm">
+                                    Load Dictionary
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-1 flex flex-col">
+                            <div class="border-b border-neon-green/30 p-2 flex justify-between items-center">
+                                <div class="text-sm">Cracking Session - Running</div>
+                                <div class="flex space-x-2 text-xs">
+                                    <button class="px-2 py-1 bg-dark-gray hover:bg-medium-gray rounded">
+                                        <i class="fa fa-pause mr-1"></i> Pause
+                                    </button>
+                                    <button class="px-2 py-1 bg-neon-red/20 hover:bg-neon-red/30 text-neon-red rounded border border-neon-red/50 transition-colors">
+                                        <i class="fa fa-stop mr-1"></i> Stop
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="flex-1 overflow-y-auto p-4">
+                                <div class="grid grid-cols-3 gap-4 mb-4">
+                                    <div class="bg-dark-gray p-3 rounded">
+                                        <div class="text-xs text-gray-400">Status</div>
+                                        <div class="text-neon-green font-bold">Running</div>
+                                    </div>
+                                    <div class="bg-dark-gray p-3 rounded">
+                                        <div class="text-xs text-gray-400">Hash Rate</div>
+                                        <div class="text-neon-blue font-bold">14.2 MH/s</div>
+                                    </div>
+                                    <div class="bg-dark-gray p-3 rounded">
+                                        <div class="text-xs text-gray-400">Progress</div>
+                                        <div class="text-neon-purple font-bold">37.8%</div>
+                                    </div>
+                                    <div class="bg-dark-gray p-3 rounded">
+                                        <div class="text-xs text-gray-400">Passwords Tried</div>
+                                        <div class="font-bold">127,493,582</div>
+                                    </div>
+                                    <div class="bg-dark-gray p-3 rounded">
+                                        <div class="text-xs text-gray-400">Time Elapsed</div>
+                                        <div class="font-bold">00:42:18</div>
+                                    </div>
+                                    <div class="bg-dark-gray p-3 rounded">
+                                        <div class="text-xs text-gray-400">Est. Remaining</div>
+                                        <div class="font-bold">01:08:42</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <div class="h-24">
+                                        <canvas id="hashRateChart"></canvas>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <h4 class="text-neon-blue text-sm mb-2">Found Hashes</h4>
+                                    <div class="bg-dark-gray rounded overflow-hidden">
+                                        <table class="w-full border-collapse text-xs">
+                                            <thead>
+                                                <tr class="text-neon-green border-b border-gray-700">
+                                                    <th class="text-left p-2">Hash</th>
+                                                    <th class="text-left p-2">Plaintext</th>
+                                                    <th class="text-left p-2">Time Found</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="border-b border-gray-800 hover:bg-medium-gray/30">
+                                                    <td class="p-2 truncate max-w-xs">5f4dcc3b5aa765d61d8327deb882cf99</td>
+                                                    <td class="p-2 text-neon-green">password</td>
+                                                    <td class="p-2">00:12:34</td>
+                                                </tr>
+                                                <tr class="border-b border-gray-800 hover:bg-medium-gray/30">
+                                                    <td class="p-2 truncate max-w-xs">e10adc3949ba59abbe56e057f20f883e</td>
+                                                    <td class="p-2 text-neon-green">123456</td>
+                                                    <td class="p-2">00:15:07</td>
+                                                </tr>
+                                                <tr class="hover:bg-medium-gray/30">
+                                                    <td class="p-2 truncate max-w-xs">96e79218965eb72c92a549dd5a330112</td>
+                                                    <td class="p-2 text-neon-green">qwerty</td>
+                                                    <td class="p-2">00:22:19</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="text-neon-blue text-sm mb-2">Session Log</h4>
+                                    <div class="bg-dark-gray rounded p-3 text-xs h-40 overflow-y-auto font-mono">
+                                        <div class="mb-1"><span class="text-gray-500">[00:00:00]</span> Session started</div>
+                                        <div class="mb-1"><span class="text-gray-500">[00:00:01]</span> Loaded 1 hash(es) for cracking</div>
+                                        <div class="mb-1"><span class="text-gray-500">[00:00:02]</span> Using SHA-256 algorithm</div>
+                                        <div class="mb-1"><span class="text-gray-500">[00:00:02]</span> Brute-force attack mode selected</div>
+                                        <div class="mb-1"><span class="text-gray-500">[00:00:03]</span> Character set: abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789</div>
+                                        <div class="mb-1"><span class="text-gray-500">[00:12:34]</span> <span class="text-neon-green">Hash cracked:</span> 5f4dcc3b5aa765d61d8327deb882cf99 -> password</div>
+                                        <div class="mb-1"><span class="text-gray-500">[00:15:07]</span> <span class="text-neon-green">Hash cracked:</span> e10adc3949ba59abbe56e057f20f883e -> 123456</div>
+                                        <div class="mb-1"><span class="text-gray-500">[00:20:45]</span> Performance increased to 14.2 MH/s</div>
+                                        <div class="mb-1"><span class="text-gray-500">[00:22:19]</span> <span class="text-neon-green">Hash cracked:</span> 96e79218965eb72c92a549dd5a330112 -> qwerty</div>
+                                        <div><span class="text-gray-500">[00:42:18]</span> Current progress: 37.8% (127,493,582 passwords tried)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Network Analyzer Tool -->
+                <div id="analyzer" class="tool-window absolute inset-0 flex flex-col hidden">
+                    <div class="bg-medium-gray border-b border-neon-green/30 px-4 py-2 flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i class="fa fa-bar-chart text-neon-green mr-2"></i>
+                            <h2 class="text-neon-green">Network Analyzer - PacketPulse v3.2</h2>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-window-minimize text-xs"></i>
+                            </button>
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-window-maximize text-xs"></i>
+                            </button>
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-times text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 overflow-hidden flex flex-col">
+                        <div class="border-b border-neon-green/30 p-2 flex flex-wrap items-center gap-4">
+                            <div class="flex items-center">
+                                <span class="text-xs mr-2">Interface:</span>
+                                <select class="bg-dark-gray border border-neon-green/30 rounded px-2 py-1 text-xs focus:outline-none focus:border-neon-green">
+                                    <option>eth0 (192.168.1.100)</option>
+                                    <option>wlan0 (10.0.0.5)</option>
+                                    <option>tun0 (172.16.0.1)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <span class="text-xs mr-2">Capture Filter:</span>
+                                <input type="text" value="tcp port 80 or tcp port 443" class="bg-dark-gray border border-neon-green/30 rounded px-2 py-1 text-xs focus:outline-none focus:border-neon-green w-48">
+                            </div>
+                            
+                            <div class="flex space-x-2 ml-auto">
+                                <button class="px-3 py-1 bg-neon-red/20 hover:bg-neon-red/30 text-neon-red rounded border border-neon-red/50 transition-colors text-xs">
+                                    <i class="fa fa-stop mr-1"></i> Stop
+                                </button>
+                                <button class="px-3 py-1 bg-dark-gray hover:bg-medium-gray rounded text-xs">
+                                    <i class="fa fa-save mr-1"></i> Save
+                                </button>
+                                <button class="px-3 py-1 bg-dark-gray hover:bg-medium-gray rounded text-xs">
+                                    <i class="fa fa-filter mr-1"></i> Filters
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-1 flex overflow-hidden">
+                            <div class="w-2/3 border-r border-neon-green/30 flex flex-col">
+                                <div class="p-2 border-b border-neon-green/30 flex justify-between items-center text-xs">
+                                    <div>Packet List (1,247 captured)</div>
+                                    <div>Displaying 1-50</div>
+                                </div>
+                                
+                                <div class="flex-1 overflow-y-auto">
+                                    <table class="w-full border-collapse text-xs">
+                                        <thead>
+                                            <tr class="text-neon-green bg-dark-gray sticky top-0">
+                                                <th class="text-left p-1 border-b border-gray-700 w-16">No.</th>
+                                                <th class="text-left p-1 border-b border-gray-700 w-24">Time</th>
+                                                <th class="text-left p-1 border-b border-gray-700 w-24">Source</th>
+                                                <th class="text-left p-1 border-b border-gray-700 w-24">Destination</th>
+                                                <th class="text-left p-1 border-b border-gray-700 w-16">Protocol</th>
+                                                <th class="text-left p-1 border-b border-gray-700">Info</th>
+                                                <th class="text-left p-1 border-b border-gray-700 w-16">Length</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="border-b border-gray-800 hover:bg-medium-gray/30 bg-medium-gray/20">
+                                                <td class="p-1">1243</td>
+                                                <td class="p-1">42.876</td>
+                                                <td class="p-1 text-neon-green">192.168.1.100</td>
+                                                <td class="p-1 text-neon-blue">203.0.113.42</td>
+                                                <td class="p-1 text-neon-purple">TCP</td>
+                                                <td class="p-1 truncate">54321 → 443 [SYN] Seq=0 Win=64240 Len=0 MSS=1460</td>
+                                                <td class="p-1">60</td>
+                                            </tr>
+                                            <tr class="border-b border-gray-800 hover:bg-medium-gray/30">
+                                                <td class="p-1">1244</td>
+                                                <td class="p-1">42.912</td>
+                                                <td class="p-1 text-neon-blue">203.0.113.42</td>
+                                                <td class="p-1 text-neon-green">192.168.1.100</td>
+                                                <td class="p-1 text-neon-purple">TCP</td>
+                                                <td class="p-1 truncate">443 → 54321 [SYN, ACK] Seq=0 Ack=1 Win=65535 Len=0 MSS=1460</td>
+                                                <td class="p-1">60</td>
+                                            </tr>
+                                            <tr class="border-b border-gray-800 hover:bg-medium-gray/30">
+                                                <td class="p-1">1245</td>
+                                                <td class="p-1">42.912</td>
+                                                <td class="p-1 text-neon-green">192.168.1.100</td>
+                                                <td class="p-1 text-neon-blue">203.0.113.42</td>
+                                                <td class="p-1 text-neon-purple">TCP</td>
+                                                <td class="p-1 truncate">54321 → 443 [ACK] Seq=1 Ack=1 Win=64240 Len=0</td>
+                                                <td class="p-1">54</td>
+                                            </tr>
+                                            <tr class="border-b border-gray-800 hover:bg-medium-gray/30">
+                                                <td class="p-1">1246</td>
+                                                <td class="p-1">42.914</td>
+                                                <td class="p-1 text-neon-green">192.168.1.100</td>
+                                                <td class="p-1 text-neon-blue">203.0.113.42</td>
+                                                <td class="p-1 text-neon-blue">TLSv1.3</td>
+                                                <td class="p-1 truncate">Client Hello</td>
+                                                <td class="p-1">517</td>
+                                            </tr>
+                                            <tr class="border-b border-gray-800 hover:bg-medium-gray/30">
+                                                <td class="p-1">1247</td>
+                                                <td class="p-1">42.958</td>
+                                                <td class="p-1 text-neon-blue">203.0.113.42</td>
+                                                <td class="p-1 text-neon-green">192.168.1.100</td>
+                                                <td class="p-1 text-neon-purple">TCP</td>
+                                                <td class="p-1 truncate">443 → 54321 [ACK] Seq=1 Ack=464 Win=65535 Len=0</td>
+                                                <td class="p-1">54</td>
+                                            </tr>
+                                            <tr class="border-b border-gray-800 hover:bg-medium-gray/30">
+                                                <td class="p-1">1248</td>
+                                                <td class="p-1">42.962</td>
+                                                <td class="p-1 text-neon-blue">203.0.113.42</td>
+                                                <td class="p-1 text-neon-green">192.168.1.100</td>
+                                                <td class="p-1 text-neon-blue">TLSv1.3</td>
+                                                <td class="p-1 truncate">Server Hello, Change Cipher Spec, Application Data</td>
+                                                <td class="p-1">165</td>
+                                            </tr>
+                                            <tr class="border-b border-gray-800 hover:bg-medium-gray/30">
+                                                <td class="p-1">1249</td>
+                                                <td class="p-1">42.962</td>
+                                                <td class="p-1 text-neon-green">192.168.1.100</td>
+                                                <td class="p-1 text-neon-blue">203.0.113.42</td>
+                                                <td class="p-1 text-neon-purple">TCP</td>
+                                                <td class="p-1 truncate">54321 → 443 [ACK] Seq=464 Ack=112 Win=64128 Len=0</td>
+                                                <td class="p-1">54</td>
+                                            </tr>
+                                            <tr class="border-b border-gray-800 hover:bg-medium-gray/30">
+                                                <td class="p-1">1250</td>
+                                                <td class="p-1">42.963</td>
+                                                <td class="p-1 text-neon-green">192.168.1.100</td>
+                                                <td class="p-1 text-neon-blue">203.0.113.42</td>
+                                                <td class="p-1 text-neon-blue">TLSv1.3</td>
+                                                <td class="p-1 truncate">Change Cipher Spec, Application Data</td>
+                                                <td class="p-1">113</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <div class="flex-1 flex flex-col">
+                                <div class="p-2 border-b border-neon-green/30 text-xs">Packet Details</div>
+                                
+                                <div class="flex-1 overflow-y-auto p-2 text-xs">
+                                    <div class="mb-2">
+                                        <div class="text-neon-green font-bold mb-1">Frame 1246: 517 bytes on wire (4136 bits), 517 bytes captured (4136 bits)</div>
+                                        <div class="pl-4 space-y-1">
+                                            <div>Encapsulation type: Ethernet (1)</div>
+                                            <div>Arrival Time: Jun 13, 2023 04:42:18.914123000 UTC</div>
+                                            <div>Frame Number: 1246</div>
+                                            <div>Frame Length: 517 bytes (4136 bits)</div>
+                                            <div>Capture Length: 517 bytes (4136 bits)</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-2">
+                                        <div class="text-neon-green font-bold mb-1">Ethernet II, Src: IntelCor_11:22:33 (00:1b:44:11:22:33), Dst: Cisco_aa:bb:cc (00:0c:29:aa:bb:cc)</div>
+                                        <div class="pl-4 space-y-1">
+                                            <div>Destination: Cisco_aa:bb:cc (00:0c:29:aa:bb:cc)</div>
+                                            <div>Source: IntelCor_11:22:33 (00:1b:44:11:22:33)</div>
+                                            <div>Type: IPv4 (0x0800)</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-2">
+                                        <div class="text-neon-green font-bold mb-1">Internet Protocol Version 4, Src: 192.168.1.100, Dst: 203.0.113.42</div>
+                                        <div class="pl-4 space-y-1">
+                                            <div>Version: 4</div>
+                                            <div>Header Length: 20 bytes</div>
+                                            <div>Differentiated Services Field: 0x00 (DSCP: CS0, ECN: Not-ECT)</div>
+                                            <div>Total Length: 503</div>
+                                            <div>Identification: 0x5a3b (23099)</div>
+                                            <div>Flags: 0x4000, Don't fragment</div>
+                                            <div>Fragment Offset: 0</div>
+                                            <div>Time to Live: 64</div>
+                                            <div>Protocol: TCP (6)</div>
+                                            <div>Header Checksum: 0x8a3c [validation disabled]</div>
+                                            <div>Source Address: 192.168.1.100</div>
+                                            <div>Destination Address: 203.0.113.42</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-2">
+                                        <div class="text-neon-green font-bold mb-1">Transmission Control Protocol, Src Port: 54321, Dst Port: 443, Seq: 1, Len: 463</div>
+                                        <div class="pl-4 space-y-1">
+                                            <div>Source Port: 54321</div>
+                                            <div>Destination Port: 443</div>
+                                            <div>Sequence Number: 1 (relative sequence number)</div>
+                                            <div>Sequence Number (raw): 0x5f4e3d2c</div>
+                                            <div>Acknowledgment Number: 1 (relative ack number)</div>
+                                            <div>Acknowledgment Number (raw): 0x1a2b3c4d</div>
+                                            <div>Header Length: 32 bytes</div>
+                                            <div>Flags: 0x010 (ACK)</div>
+                                            <div>Window Size: 64240</div>
+                                            <div>Checksum: 0x7d3f [validation disabled]</div>
+                                            <div>Urgent Pointer: 0</div>
+                                            <div>Options: (12 bytes), No-Operation (NOP), No-Operation (NOP), Timestamps</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <div class="text-neon-green font-bold mb-1">Transport Layer Security</div>
+                                        <div class="pl-4 space-y-1">
+                                            <div>TLSv1.3 Record Layer: Handshake Protocol: Client Hello</div>
+                                            <div class="pl-4">Content Type: Handshake (22)</div>
+                                            <div class="pl-4">Version: TLS 1.0 (0x0301)</div>
+                                            <div class="pl-4">Length: 459</div>
+                                            <div class="pl-4">Handshake Protocol: Client Hello</div>
+                                            <div class="pl-8">Handshake Type: Client Hello (1)</div>
+                                            <div class="pl-8">Length: 455</div>
+                                            <div class="pl-8">Version: TLS 1.2 (0x0303)</div>
+                                            <div class="pl-8">Random: 5f4e3d2c7b8a9b0c1d2e3f4a5b6c7d8e... (4 bytes omitted)</div>
+                                            <div class="pl-8">Session ID Length: 0</div>
+                                            <div class="pl-8">Cipher Suites Length: 62</div>
+                                            <div class="pl-8">Cipher Suites (31 suites)</div>
+                                            <div class="pl-12">TLS_AES_256_GCM_SHA384 (0x1302)</div>
+                                            <div class="pl-12">TLS_CHACHA20_POLY1305_SHA256 (0x1303)</div>
+                                            <div class="pl-12">TLS_AES_128_GCM_SHA256 (0x1301)</div>
+                                            <div class="pl-12">TLS_AES_128_CCM_8_SHA256 (0x1305)</div>
+                                            <div class="pl-12">TLS_AES_128_CCM_SHA256 (0x1304)</div>
+                                            <div class="pl-12">... (26 suites omitted)</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Other tools would follow the same pattern -->
+                <div id="exploit" class="tool-window absolute inset-0 flex flex-col hidden">
+                    <div class="bg-medium-gray border-b border-neon-green/30 px-4 py-2 flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i class="fa fa-bug text-neon-green mr-2"></i>
+                            <h2 class="text-neon-green">Exploit Framework - VulnX v5.1</h2>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-window-minimize text-xs"></i>
+                            </button>
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-window-maximize text-xs"></i>
+                            </button>
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-times text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 p-6 flex items-center justify-center">
+                        <div class="text-center">
+                            <i class="fa fa-bug text-6xl text-neon-red mb-4"></i>
+                            <h3 class="text-neon-blue text-xl mb-2">Exploit Framework</h3>
+                            <p class="text-gray-400 mb-6">Exploit database and penetration testing toolkit</p>
+                            <div class="text-sm text-gray-500">Select this tool from the sidebar to begin</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="forensics" class="tool-window absolute inset-0 flex flex-col hidden">
+                    <div class="bg-medium-gray border-b border-neon-green/30 px-4 py-2 flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i class="fa fa-search-plus text-neon-green mr-2"></i>
+                            <h2 class="text-neon-green">Forensics Toolkit - EvidenceFinder v2.8</h2>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-window-minimize text-xs"></i>
+                            </button>
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-window-maximize text-xs"></i>
+                            </button>
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-times text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 p-6 flex items-center justify-center">
+                        <div class="text-center">
+                            <i class="fa fa-search-plus text-6xl text-neon-blue mb-4"></i>
+                            <h3 class="text-neon-blue text-xl mb-2">Forensics Toolkit</h3>
+                            <p class="text-gray-400 mb-6">Digital evidence analysis and recovery tools</p>
+                            <div class="text-sm text-gray-500">Select this tool from the sidebar to begin</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="crypto" class="tool-window absolute inset-0 flex flex-col hidden">
+                    <div class="bg-medium-gray border-b border-neon-green/30 px-4 py-2 flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i class="fa fa-lock text-neon-green mr-2"></i>
+                            <h2 class="text-neon-green">Crypto Suite - EncryptX v4.3</h2>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-window-minimize text-xs"></i>
+                            </button>
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-window-maximize text-xs"></i>
+                            </button>
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-times text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 p-6 flex items-center justify-center">
+                        <div class="text-center">
+                            <i class="fa fa-lock text-6xl text-neon-purple mb-4"></i>
+                            <h3 class="text-neon-blue text-xl mb-2">Crypto Suite</h3>
+                            <p class="text-gray-400 mb-6">Encryption, decryption and steganography tools</p>
+                            <div class="text-sm text-gray-500">Select this tool from the sidebar to begin</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="editor" class="tool-window absolute inset-0 flex flex-col hidden">
+                    <div class="bg-medium-gray border-b border-neon-green/30 px-4 py-2 flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i class="fa fa-code text-neon-green mr-2"></i>
+                            <h2 class="text-neon-green">Code Editor - NexusEdit v3.6</h2>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-window-minimize text-xs"></i>
+                            </button>
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-window-maximize text-xs"></i>
+                            </button>
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-times text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 p-6 flex items-center justify-center">
+                        <div class="text-center">
+                            <i class="fa fa-code text-6xl text-neon-green mb-4"></i>
+                            <h3 class="text-neon-blue text-xl mb-2">Code Editor</h3>
+                            <p class="text-gray-400 mb-6">Syntax-highlighted code editor with debugging tools</p>
+                            <div class="text-sm text-gray-500">Select this tool from the sidebar to begin</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="monitor" class="tool-window absolute inset-0 flex flex-col hidden">
+                    <div class="bg-medium-gray border-b border-neon-green/30 px-4 py-2 flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i class="fa fa-tachometer text-neon-green mr-2"></i>
+                            <h2 class="text-neon-green">System Monitor - ResourceHog v2.2</h2>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-window-minimize text-xs"></i>
+                            </button>
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-window-maximize text-xs"></i>
+                            </button>
+                            <button class="w-4 h-4 flex items-center justify-center hover:bg-dark-gray rounded">
+                                <i class="fa fa-times text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 p-6 flex items-center justify-center">
+                        <div class="text-center">
+                            <i class="fa fa-tachometer text-6xl text-neon-blue mb-4"></i>
+                            <h3 class="text-neon-blue text-xl mb-2">System Monitor</h3>
+                            <p class="text-gray-400 mb-6">Real-time system resource monitoring and analysis</p>
+                            <div class="text-sm text-gray-500">Select this tool from the sidebar to begin</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Update system time
+        function updateSystemTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('system-time').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+        
+        setInterval(updateSystemTime, 1000);
+        updateSystemTime();
+        
+        // Terminal cursor animation
+        function animateCursor() {
+            const cursor = document.getElementById('terminal-input-cursor');
+            cursor.style.opacity = cursor.style.opacity === '0' ? '1' : '0';
+        }
+        
+        setInterval(animateCursor, 500);
+        
+        // Tool navigation
+        document.querySelectorAll('.tool-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Hide all tools
+                document.querySelectorAll('.tool-window').forEach(tool => {
+                    tool.classList.add('hidden');
+                });
+                
+                // Show selected tool
+                const toolId = this.getAttribute('data-tool');
+                document.getElementById(toolId).classList.remove('hidden');
+                
+                // Update active link styling
+                document.querySelectorAll('.tool-link').forEach(l => {
+                    l.classList.remove('text-neon-green');
+                    l.classList.add('text-gray-400');
+                });
+                this.classList.remove('text-gray-400');
+                this.classList.add('text-neon-green');
+            });
+        });
+        
+        // Initialize hash rate chart
+        const hashRateCtx = document.getElementById('hashRateChart');
+        if (hashRateCtx) {
+            new Chart(hashRateCtx, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '00:05', '00:10', '00:15', '00:20', '00:25', '00:30', '00:35', '00:40'],
+                    datasets: [{
+                        label: 'Hash Rate (MH/s)',
+                        data: [8.2, 9.5, 10.1, 11.3, 12.8, 13.5, 13.9, 14.1, 14.2],
+                        borderColor: '#39ff14',
+                        backgroundColor: 'rgba(57, 255, 20, 0.1)',
+                        borderWidth: 1,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Simulate terminal input
+        const terminalOutput = document.getElementById('terminal-output');
+        const commands = [
+            'nmap -sV -O 192.168.1.1/24',
+            'cat /etc/passwd',
+            'netstat -antp',
+            'ps aux | grep root',
+            'cd /var/log && ls -la',
+            'grep -r "password" /var/www',
+            'sudo tcpdump -i eth0 -w capture.pcap'
+        ];
+        
+        let commandIndex = 0;
+        
+        document.addEventListener('keydown', function(e) {
+            const activeTool = document.querySelector('.tool-window:not(.hidden)').id;
+            if (activeTool !== 'terminal') return;
+            
+            const cursor = document.getElementById('terminal-input-cursor');
+            const parentDiv = cursor.parentElement;
+            
+            if (e.key === 'Enter') {
+                // Finalize current command
+                cursor.remove();
+                terminalOutput.innerHTML += '<div class="mb-1"><span class="text-neon-blue">root@neuron</span><span class="text-gray-400">:</span><span class="text-neon-purple">~</span><span class="text-gray-300">#</span> <span class="text-gray-300">' + parentDiv.textContent.trim() + '</span></div>';
+                
+                // Add simulated output
+                if (parentDiv.textContent.trim() !== '') {
+                    terminalOutput.innerHTML += '<div class="mb-4 pl-4 text-sm text-gray-400">Executing command: ' + parentDiv.textContent.trim() + '</div>';
+                }
+                
+                // Add new command prompt
+                terminalOutput.innerHTML += '<div><span class="text-neon-blue">root@neuron</span><span class="text-gray-400">:</span><span class="text-neon-purple">~</span><span class="text-gray-300">#</span> <span id="terminal-input-cursor">_</span></div>';
+                
+                // Scroll to bottom
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+                
+                // Reset cursor animation
+                clearInterval(cursorInterval);
+                const newCursor = document.getElementById('terminal-input-cursor');
+                cursorInterval = setInterval(() => {
+                    newCursor.style.opacity = newCursor.style.opacity === '0' ? '1' : '0';
+                }, 500);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                // Cycle through command history
+                const currentText = parentDiv.textContent.replace(/_/, '').trim();
+                const newCommand = commands[commandIndex % commands.length];
+                commandIndex++;
+                
+                // Replace current text with command from history
+                cursor.remove();
+                parentDiv.innerHTML = '<span class="text-neon-blue">root@neuron</span><span class="text-gray-400">:</span><span class="text-neon-purple">~</span><span class="text-gray-300">#</span> <span class="text-gray-300">' + newCommand + '</span><span id="terminal-input-cursor">_</span>';
+            } else if (e.key.length === 1 && e.key !== ' ') {
+                // Add typed character
+                cursor.insertAdjacentText('beforebegin', e.key);
+            } else if (e.key === ' ') {
+                // Add space
+                cursor.insertAdjacentText('beforebegin', ' ');
+            } else if (e.key === 'Backspace') {
+                // Remove last character
+                const previousSibling = cursor.previousSibling;
+                if (previousSibling && previousSibling.textContent) {
+                    previousSibling.textContent = previousSibling.textContent.slice(0, -1);
+                }
+            }
+        });
+        
+        let cursorInterval = setInterval(animateCursor, 500);
+    </script>
+</body>
+</html>
