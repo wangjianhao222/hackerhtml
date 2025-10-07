@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G.H.O.S.T. Protocol v4.2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="container">
+        <header class="panel">
+            <h1>G.H.O.S.T. PROTOCOL v4.2 - GLOBAL HOSTILE OPERATIONS & SURVEILLANCE TERMINAL</h1>
+        </header>
+
+        <main class="panel">
+            <div class="panel-title">> Main Console_</div>
+            <div id="terminal-content">
+                <div id="terminal"></div>
+                <span>root@ghost:~#</span><span id="prompt-input"></span><span class="cursor"></span>
+            </div>
+        </main>
+
+        <aside class="panel">
+            <div id="toolbox">
+                <div class="panel-title">> ToolKit_</div>
+                <button class="tool-button" data-cmd="nmap">Nmap Scan</button>
+                <button class="tool-button" data-cmd="metasploit">Metasploit</button>
+                <button class="tool-button" data-cmd="wireshark">Wireshark</button>
+                <button class="tool-button" data-cmd="aircrack">Aircrack-ng</button>
+                <button class="tool-button" data-cmd="hashcat">Hashcat</button>
+                <button class="tool-button" data-cmd="sqlmap">SQLmap</button>
+                <button class="tool-button" data-cmd="john">JohnTheRipper</button>
+                <button class="tool-button" data-cmd="hydra">Hydra</button>
+            </div>
+            <div id="vitals" style="margin-top: 20px;">
+                <div class="panel-title">> System Vitals_</div>
+                <div class="vitals-grid">
+                    <div>
+                        <span>CPU Load: <span id="cpu-val">0%</span></span>
+                        <div class="progress-bar"><div id="cpu-bar" class="progress-bar-inner"></div></div>
+                    </div>
+                    <div>
+                        <span>Mem Usage: <span id="mem-val">0%</span></span>
+                        <div class="progress-bar"><div id="mem-bar" class="progress-bar-inner"></div></div>
+                    </div>
+                    <div>
+                        <span>Net Down: <span id="net-down-val">0 KB/s</span></span>
+                        <div class="progress-bar"><div id="net-down-bar" class="progress-bar-inner"></div></div>
+                    </div>
+                     <div>
+                        <span>Net Up: <span id="net-up-val">0 KB/s</span></span>
+                        <div class="progress-bar"><div id="net-up-bar" class="progress-bar-inner"></div></div>
+                    </div>
+                </div>
+            </div>
+             <div id="live-feed" style="margin-top: 20px; flex-grow: 1; display: flex; flex-direction: column;">
+                <div class="panel-title">> Live Attack Feed_</div>
+                <div id="log-box"></div>
+            </div>
+        </aside>
+
+        <footer class="panel">
+            <div>STATUS: <span style="color: #00bfff;">SECURE / ENCRYPTED</span></div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span>CONNECTION: STABLE</span>
+                <div id="status-light"></div>
+            </div>
+            <div>[ G.H.O.S.T. // Unauthorized Access Prohibited ]</div>
+        </footer>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
